@@ -5,10 +5,6 @@
   "main": "src/main.js",
   "private": true,
   "scripts": {
-    "start": "electron .",
     "test": "node --test test/"
-  },
-  "devDependencies": {
-    "electron": "^28.3.3"
   }
 }

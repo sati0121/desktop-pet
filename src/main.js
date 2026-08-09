@@ -18,13 +18,12 @@ const ROOT = path.join(__dirname, '..'); // pet/
 // 形象文件名 -> 显示名称（未列出的用文件名当名称）
 const SPRITE_NAMES = {
   zhanli: '站立背书包', dun: '蹲姿', heshui: '坐姿捧杯', zhengfa: '整理头发',
-  q_zhan: '挥手', q_pa: '趴卧卖萌', q_zuo: '坐凳捧杯', q_pachuang: '趴床',
-  placeholder: '占位小猫'
+  q_zhan: '挥手', q_pa: '趴卧卖萌', q_zuo: '坐凳捧杯', q_pachuang: '趴床'
 };
 
 const SPRITES_DIR = path.join(ROOT, 'src/renderer/assets/sprites');
 
-// 动态扫描形象目录：本地可含多个形象，克隆后只有占位图，均自动识别
+// 动态扫描形象目录：放入的 PNG 自动出现在右键菜单
 function loadSprites() {
   let files = [];
   try {
@@ -33,7 +32,13 @@ function loadSprites() {
   return files.map((f) => {
     const id = f.replace(/\.png$/, '');
     return { id, name: SPRITE_NAMES[id] || id, path: 'src/renderer/assets/sprites/' + f };
-  }).sort((a, b) => (a.id === 'placeholder' ? 1 : b.id === 'placeholder' ? -1 : 0));
+  });
+}
+
+// 默认形象：目录内第一个 PNG；目录为空时返回 null
+function defaultSprite() {
+  const list = loadSprites();
+  return list.length ? list[0] : null;
 }
 
 // 默认字幕（气泡文案）
@@ -61,7 +66,14 @@ function primaryWorkArea() {
 }
 
 function spritePath() {
-  const s = config.sprite || { root: 'app', path: 'src/renderer/assets/sprites/placeholder.png' };
+  // 未配置或配置失效时，回退到目录内第一个形象
+  let s = config.sprite;
+  if (!s || !s.path || !/\.png$/.test(s.path)) {
+    const d = defaultSprite();
+    if (!d) return '';
+    s = { root: 'app', path: d.path };
+    config.sprite = s;
+  }
   return s.root === 'userData'
     ? path.join(app.getPath('userData'), s.path)
     : path.join(ROOT, s.path);
@@ -372,10 +384,11 @@ function applySprite() {
 /* ---------------- 默认配置 ---------------- */
 
 function makeDefaults() {
+  const d = defaultSprite();
   return {
     version: 1,
     area: geometry.defaultArea(primaryWorkArea()),
-    sprite: { root: 'app', path: 'src/renderer/assets/sprites/placeholder.png' },
+    sprite: d ? { root: 'app', path: d.path } : null,
     petHeight: PET_HEIGHT,
     alwaysOnTopLevel: 'floating',
     subtitles: DEFAULT_SUBTITLES.slice()
@@ -476,13 +489,14 @@ ipcMain.on('area:save', saveArea);
 app.whenReady().then(() => {
   config = configStore.load(makeDefaults());
   config.area = geometry.clampArea(config.area, primaryWorkArea());
-  // 校验形象文件存在，失效则回退默认（避免旧配置路径失效导致崩溃）
-  const sp = config.sprite || makeDefaults().sprite;
-  const img = nativeImage.createFromPath(
-    sp.root === 'userData' ? path.join(app.getPath('userData'), sp.path) : path.join(ROOT, sp.path)
-  );
-  if (img.isEmpty()) {
-    config.sprite = makeDefaults().sprite;
+  // 校验形象文件存在，失效则回退目录内第一个形象（避免旧配置路径失效导致崩溃）
+  const sp = config.sprite;
+  const spPath = sp && sp.path
+    ? (sp.root === 'userData' ? path.join(app.getPath('userData'), sp.path) : path.join(ROOT, sp.path))
+    : '';
+  if (!spPath || nativeImage.createFromPath(spPath).isEmpty()) {
+    const d = defaultSprite();
+    config.sprite = d ? { root: 'app', path: d.path } : null;
     configStore.save(config);
   }
   spriteSize = computeSpriteSize();

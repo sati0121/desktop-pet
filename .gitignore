@@ -17,6 +17,5 @@ desktop.ini
 # 运行时临时
 *.tmp
 
-# 人物形象图（隐私，不上传）—— 保留占位图 placeholder.png
-src/renderer/assets/sprites/*
-!src/renderer/assets/sprites/placeholder.png
+# 人物形象图（隐私，不上传）
+src/renderer/assets/sprites/
