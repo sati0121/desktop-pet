@@ -19,23 +19,22 @@
 ### 环境要求
 
 - Windows 10/11
-- 已安装 [Electron](https://electronjs.org)（或使用任意已存在的 Electron 运行时）
+- [Node.js](https://nodejs.org)（含 npm）
 
-### 启动
+### 安装与启动
 
-1. 将本仓库目录作为 Electron 应用根目录。
-2. 准备宠物形象（见下文「形象准备」）。
-3. 用 Electron 加载本目录启动：
+```bash
+npm install        # 安装 Electron 等依赖
+npm start          # 启动桌面宠物
+```
 
-   ```bash
-   electron .
-   ```
+> 首次启动会显示一个**占位小猫形象**；放入你自己的形象图后（见下文）即可切换。
 
-> 提示：`run.bat` 是作者本机环境的启动脚本，其中 Electron 路径为本地绝对路径，直接使用时需修改为你的 Electron 位置。
+> 也可以双击 `run.bat`：它会优先使用项目内安装的 Electron；若尚未 `npm install`，则回退到脚本中预设的本地 Electron 路径（可自行修改）。
 
 ## 形象准备
 
-> ⚠️ **本仓库不包含任何形象图片**，需由使用者自行准备。
+> ⚠️ **本仓库不包含任何个人形象图片**，需由使用者自行准备。
 
 宠物形象为**透明背景（含 alpha 通道）的 PNG 图片**，要求：
 
@@ -46,18 +45,8 @@
 ### 放置方式
 
 1. 将透明 PNG 放入目录：`src/renderer/assets/sprites/`
-2. 在 `src/main.js` 的 `SPRITES` 数组中注册：
-
-   ```js
-   const SPRITES = [
-     { id: 'sprite1', name: '我的形象1', path: 'src/renderer/assets/sprites/sprite1.png' },
-     // ...
-   ];
-   ```
-
-   右键宠物 → 形象 即可切换。
-
-3. 程序启动默认使用 `SPRITES` 第一项作为初始形象。
+2. 程序会自动扫描该目录，无需改代码；右键宠物 → 形象 即可切换。
+3. 程序启动默认使用 `placeholder.png`（占位小猫），切换后会记住你选的形象。
 
 ### 从照片制作透明 PNG
 

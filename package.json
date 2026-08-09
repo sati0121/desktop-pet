@@ -1,10 +1,14 @@
 {
   "name": "desktop-pet",
   "version": "1.0.0",
-  "description": "桌面宝宝一宁 - 桌面小宠物",
+  "description": "A cute desktop pet for Windows built with Electron",
   "main": "src/main.js",
   "private": true,
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "test": "node --test test/"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3"
   }
 }

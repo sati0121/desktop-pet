@@ -15,17 +15,26 @@ const BUBBLE_HEAD = 108;             // 窗口顶部预留的气泡显示区高�
 const BUBBLE_MIN_W = 190;            // 窗口最小宽度（容纳气泡文字，宽些减少换行）
 const ROOT = path.join(__dirname, '..'); // pet/
 
-// 预设形象列表（右键菜单切换）
-const SPRITES = [
-  { id: 'zhanli', name: 'Q版站立', path: 'src/renderer/assets/sprites/zhanli.png' },
-  { id: 'dun', name: 'Q版蹲姿', path: 'src/renderer/assets/sprites/dun.png' },
-  { id: 'heshui', name: 'Q版喝水', path: 'src/renderer/assets/sprites/heshui.png' },
-  { id: 'zhengfa', name: '整理头发', path: 'src/renderer/assets/sprites/zhengfa.png' },
-  { id: 'q_zhan', name: '挥手', path: 'src/renderer/assets/sprites/q_zhan.png' },
-  { id: 'q_pa', name: '趴卧卖萌', path: 'src/renderer/assets/sprites/q_pa.png' },
-  { id: 'q_zuo', name: '坐凳捧杯', path: 'src/renderer/assets/sprites/q_zuo.png' },
-  { id: 'q_pachuang', name: '趴床', path: 'src/renderer/assets/sprites/q_pachuang.png' }
-];
+// 形象文件名 -> 显示名称（未列出的用文件名当名称）
+const SPRITE_NAMES = {
+  zhanli: '站立背书包', dun: '蹲姿', heshui: '坐姿捧杯', zhengfa: '整理头发',
+  q_zhan: '挥手', q_pa: '趴卧卖萌', q_zuo: '坐凳捧杯', q_pachuang: '趴床',
+  placeholder: '占位小猫'
+};
+
+const SPRITES_DIR = path.join(ROOT, 'src/renderer/assets/sprites');
+
+// 动态扫描形象目录：本地可含多个形象，克隆后只有占位图，均自动识别
+function loadSprites() {
+  let files = [];
+  try {
+    files = fs.readdirSync(SPRITES_DIR).filter((f) => f.endsWith('.png'));
+  } catch (_) { /* 目录不存在时返回空 */ }
+  return files.map((f) => {
+    const id = f.replace(/\.png$/, '');
+    return { id, name: SPRITE_NAMES[id] || id, path: 'src/renderer/assets/sprites/' + f };
+  }).sort((a, b) => (a.id === 'placeholder' ? 1 : b.id === 'placeholder' ? -1 : 0));
+}
 
 // 默认字幕（气泡文案）
 const DEFAULT_SUBTITLES = ['嘿嘿～', '陪你玩～', '么么哒', '抱抱～', '啾咪！', '戳我干嘛！', '我在散步～', '加油鸭！'];
@@ -52,7 +61,7 @@ function primaryWorkArea() {
 }
 
 function spritePath() {
-  const s = config.sprite || { root: 'app', path: 'src/renderer/assets/sprites/zhanli.png' };
+  const s = config.sprite || { root: 'app', path: 'src/renderer/assets/sprites/placeholder.png' };
   return s.root === 'userData'
     ? path.join(app.getPath('userData'), s.path)
     : path.join(ROOT, s.path);
@@ -195,7 +204,7 @@ function createPetWindow() {
 
 function showPetMenu() {
   const currentPath = config.sprite && config.sprite.root === 'app' ? config.sprite.path : '';
-  const spriteItems = SPRITES.map((s) => ({
+  const spriteItems = loadSprites().map((s) => ({
     label: s.name,
     type: 'radio',
     checked: currentPath === s.path,
@@ -341,6 +350,11 @@ function applySprite() {
     return;
   }
   const sz = img.getSize();
+  // 切换形象时若当前尺寸超过新形象上限，自动收回
+  const maxH = maxPetHeight();
+  if ((config.petHeight || PET_HEIGHT) > maxH) {
+    config.petHeight = maxH;
+  }
   const h = config.petHeight || PET_HEIGHT;
   const w = Math.max(BUBBLE_MIN_W, Math.round(h * sz.width / sz.height));
   spriteSize = { w, h: h + BUBBLE_HEAD };
@@ -361,7 +375,7 @@ function makeDefaults() {
   return {
     version: 1,
     area: geometry.defaultArea(primaryWorkArea()),
-    sprite: { root: 'app', path: 'src/renderer/assets/sprites/zhanli.png' },
+    sprite: { root: 'app', path: 'src/renderer/assets/sprites/placeholder.png' },
     petHeight: PET_HEIGHT,
     alwaysOnTopLevel: 'floating',
     subtitles: DEFAULT_SUBTITLES.slice()
