@@ -66,6 +66,7 @@ python tools/prep_sprite.py <源图片路径>    # 抠出单张透明 PNG
 - 脚本输出到 `src/renderer/assets/sprites/` 并自动裁剪、缩放。
 - 若 rembg 不可用，脚本会自动回退为 flood-fill 色键抠图（背景较简单时可用）。
 - 抠图后建议人工检查边缘，必要时手动清理残留。
+- 强烈建议自行抠图
 
 ## 活动区域
 
