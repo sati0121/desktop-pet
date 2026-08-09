@@ -13,7 +13,7 @@ function render() {
 
     const input = document.createElement('input');
     input.value = text;
-    input.maxLength = 20;
+    input.maxLength = 40;
     input.addEventListener('input', () => {
       subs[i] = input.value;
       save();

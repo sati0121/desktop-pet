@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <link rel="stylesheet" href="size.css">
+  <title>调整形象尺寸</title>
+</head>
+<body>
+  <div class="app">
+    <div class="row">
+      <span class="label">形象尺寸</span>
+      <span class="pct" id="pct">100%</span>
+    </div>
+    <input type="range" id="slider" min="0" max="100" value="100">
+    <div class="row2">
+      <span class="hint" id="hint"></span>
+      <button id="reset" title="恢复默认">恢复默认</button>
+    </div>
+  </div>
+  <script src="size.js"></script>
+</body>
+</html>

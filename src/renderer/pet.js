@@ -84,8 +84,14 @@ function actionDuration(cls) {
 
 function showBubble(text) {
   bubble.textContent = text;
+  // 按字数选择字号：短句大号、长句小号，保证完整显示
+  bubble.classList.remove('big', 'mid', 'small');
+  const len = (text || '').length;
+  if (len <= 6) bubble.classList.add('big');
+  else if (len <= 14) bubble.classList.add('mid');
+  else bubble.classList.add('small');
   bubble.classList.add('show');
-  setTimeout(() => bubble.classList.remove('show'), 1600);
+  setTimeout(() => bubble.classList.remove('show'), 2000);
 }
 
 function playRandomAction() {

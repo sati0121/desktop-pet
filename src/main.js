@@ -10,8 +10,9 @@ const geometry = require('./geometry');
 app.setName('desktop-pet');
 
 const PET_HEIGHT = 180;              // 宠物逻辑高度
-const BUBBLE_HEAD = 84;              // 窗口顶部预留的气泡显示区高度
-const BUBBLE_MIN_W = 150;            // 窗口最小宽度（容纳气泡文字）
+const MIN_PET_HEIGHT = 60;           // 形象高度下限
+const BUBBLE_HEAD = 108;             // 窗口顶部预留的气泡显示区高度（容纳多行长字幕）
+const BUBBLE_MIN_W = 190;            // 窗口最小宽度（容纳气泡文字，宽些减少换行）
 const ROOT = path.join(__dirname, '..'); // pet/
 
 // 预设形象列表（右键菜单切换）
@@ -32,6 +33,7 @@ const DEFAULT_SUBTITLES = ['嘿嘿～', '陪你玩～', '么么哒', '抱抱～'
 let petWindow = null;
 let editorWindow = null;
 let subtitleWindow = null;
+let sizeWindow = null;
 let config = null;
 let spriteSize = { w: 150, h: 180 };
 let petPos = { x: 0, y: 0 };
@@ -64,6 +66,21 @@ function computeSpriteSize() {
   // 窗口宽 = 人物宽与气泡最小宽取大；窗口高 = 人物高 + 顶部气泡区
   const w = Math.max(BUBBLE_MIN_W, Math.round(h * sz.width / sz.height));
   return { w, h: h + BUBBLE_HEAD };
+}
+
+// 计算形象高度上限：窗口整体不得超出活动区域
+function maxPetHeight() {
+  const img = nativeImage.createFromPath(spritePath());
+  if (img.isEmpty()) return Math.max(MIN_PET_HEIGHT, config.area.h - BUBBLE_HEAD);
+  const sz = img.getSize();
+  const ratio = sz.width / sz.height;
+  const a = config.area;
+  // 高度约束：形象高 + 气泡区 <= 区域高
+  let maxH = a.h - BUBBLE_HEAD;
+  // 宽度约束：形象宽 = h * 宽高比 <= 区域宽（考虑气泡最小宽）
+  const maxByW = (a.w - 4) / ratio;
+  maxH = Math.floor(Math.min(maxH, maxByW));
+  return Math.max(maxH, MIN_PET_HEIGHT);
 }
 
 function notify(channel, payload) {
@@ -188,6 +205,7 @@ function showPetMenu() {
     { label: '形象', submenu: spriteItems },
     { type: 'separator' },
     { label: '字幕管理…', click: openSubtitleEditor },
+    { label: '调整尺寸…', click: openSizeSlider },
     { label: '调整活动区域', click: openAreaEditor },
     { label: '更换形象…', click: chooseSprite },
     { type: 'separator' },
@@ -265,6 +283,33 @@ function openSubtitleEditor() {
   subtitleWindow.on('closed', () => { subtitleWindow = null; });
 }
 
+/* ---------------- 尺寸调整滑块窗口 ---------------- */
+
+function openSizeSlider() {
+  if (sizeWindow) { sizeWindow.focus(); return; }
+  sizeWindow = new BrowserWindow({
+    width: 340, height: 180,
+    title: '调整形象尺寸',
+    alwaysOnTop: true,
+    resizable: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true, nodeIntegration: false, sandbox: true
+    }
+  });
+  sizeWindow.loadFile(path.join(__dirname, 'renderer', 'size.html'));
+  sizeWindow.on('closed', () => { sizeWindow = null; });
+}
+
+// 应用形象高度（受区域上限约束）
+function setPetHeight(h) {
+  const maxH = maxPetHeight();
+  h = Math.round(Math.max(MIN_PET_HEIGHT, Math.min(h, maxH)));
+  if (h === config.petHeight) return;
+  config.petHeight = h;
+  applySprite();
+}
+
 /* ---------------- 更换形象 ---------------- */
 
 async function chooseSprite() {
@@ -340,10 +385,24 @@ ipcMain.on('subtitle:set', (_e, list) => {
   if (!Array.isArray(list)) return;
   const clean = list
     .map((s) => (typeof s === 'string' ? s.trim() : ''))
-    .filter((s) => s.length > 0 && s.length <= 20);
+    .filter((s) => s.length > 0 && s.length <= 40);
   config.subtitles = clean.length ? clean : DEFAULT_SUBTITLES.slice();
   configStore.save(config);
   notify('pet:subtitles-updated', config.subtitles);
+});
+
+// 尺寸调整
+ipcMain.handle('size:get', () => ({
+  current: config.petHeight || PET_HEIGHT,
+  min: MIN_PET_HEIGHT,
+  max: maxPetHeight(),
+  def: PET_HEIGHT,
+  bubbleHead: BUBBLE_HEAD,
+  area: config.area
+}));
+
+ipcMain.on('size:set', (_e, h) => {
+  if (typeof h === 'number' && h >= MIN_PET_HEIGHT) setPetHeight(h);
 });
 
 ipcMain.on('pet:ready', startWalking);

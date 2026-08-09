@@ -19,5 +19,8 @@ contextBridge.exposeInMainWorld('petAPI', {
   editorSave: () => ipcRenderer.send('area:save'),
   // 字幕管理窗口
   getSubtitles: () => ipcRenderer.invoke('subtitle:get'),
-  setSubtitles: (list) => ipcRenderer.send('subtitle:set', list)
+  setSubtitles: (list) => ipcRenderer.send('subtitle:set', list),
+  // 尺寸调整窗口
+  getSize: () => ipcRenderer.invoke('size:get'),
+  setSize: (h) => ipcRenderer.send('size:set', h)
 });

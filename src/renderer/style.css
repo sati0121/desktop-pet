@@ -36,12 +36,13 @@ body::before {
   image-rendering: auto;
 }
 
-/* 可爱气泡：大字号、深底白字、头顶居中显示 */
+/* 可爱气泡：深底白字、头顶居中，长句自动换行不裁剪 */
 #bubble {
   position: absolute;
-  top: 10px; left: 50%;
+  top: 8px; left: 50%;
   transform: translateX(-50%);
-  max-width: 130px;
+  max-width: calc(100% - 16px);   /* 不超过窗口宽度，留 8px 边距 */
+  min-width: 130px;               /* 保证气泡宽度稳定，长句换行更少 */
   background: rgba(0, 0, 0, 0.82);
   color: #fff;
   font-size: 16px;
@@ -57,8 +58,13 @@ body::before {
   transition: opacity .18s;
   pointer-events: none;
   z-index: 10;
-  white-space: nowrap;
+  overflow-wrap: break-word;      /* 长句自动换行 */
+  word-break: break-word;
+  white-space: normal;            /* 允许换行，替代原 nowrap */
 }
+#bubble.big   { font-size: 16px; }   /* 短句：大号 */
+#bubble.mid   { font-size: 14px; }   /* 中句 */
+#bubble.small { font-size: 12px; }   /* 长句：小号保证装下 */
 #bubble::after {
   content: '';
   position: absolute;
