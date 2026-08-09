@@ -1,0 +1,10 @@
+{
+  "name": "desktop-pet",
+  "version": "1.0.0",
+  "description": "桌面宝宝一宁 - 桌面小宠物",
+  "main": "src/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron ."
+  }
+}

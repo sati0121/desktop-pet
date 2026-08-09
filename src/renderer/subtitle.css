@@ -1,0 +1,88 @@
+/* subtitle.css — 字幕管理窗口 */
+html, body {
+  margin: 0; padding: 0;
+  background: #f5f6fa;
+  font-family: "Microsoft YaHei", sans-serif;
+}
+
+.app {
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.head h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: #333;
+}
+.tip {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: #999;
+}
+
+#list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.row input {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  outline: none;
+  transition: border-color .15s;
+}
+.row input:focus { border-color: #4caf50; }
+
+.row .del {
+  flex: none;
+  width: 30px; height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: #eee;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.row .del:hover { background: #ff6b6b; color: #fff; }
+
+.add-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px dashed #bbb;
+  border-radius: 8px;
+  background: transparent;
+  color: #777;
+  cursor: pointer;
+  transition: all .15s;
+}
+.add-btn:hover { border-color: #4caf50; color: #4caf50; background: rgba(76,175,80,.06); }
+
+.saved {
+  text-align: center;
+  font-size: 12px;
+  color: #4caf50;
+  opacity: 0;
+  transition: opacity .2s;
+  height: 16px;
+  margin-top: 6px;
+}
+.saved.show { opacity: 1; }

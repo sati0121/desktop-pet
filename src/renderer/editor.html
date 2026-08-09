@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <link rel="stylesheet" href="editor.css">
+  <title>调整活动区域</title>
+</head>
+<body>
+  <div id="area">
+    <div class="handle" data-h="nw"></div>
+    <div class="handle" data-h="n"></div>
+    <div class="handle" data-h="ne"></div>
+    <div class="handle" data-h="e"></div>
+    <div class="handle" data-h="se"></div>
+    <div class="handle" data-h="s"></div>
+    <div class="handle" data-h="sw"></div>
+    <div class="handle" data-h="w"></div>
+    <div id="hint">拖动边框缩放 · 拖动内部移动 · Esc 或 ✓ 保存</div>
+    <button id="save" title="保存">✓</button>
+  </div>
+  <script src="editor.js"></script>
+</body>
+</html>

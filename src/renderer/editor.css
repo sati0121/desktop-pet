@@ -1,0 +1,65 @@
+/* editor.css — 区域编辑窗口 */
+html, body {
+  margin: 0; padding: 0;
+  overflow: hidden;
+  background: transparent;
+  width: 100%; height: 100%;
+  user-select: none;
+}
+
+#area {
+  position: absolute;
+  inset: 0;
+  border: 2px dashed #4caf50;
+  box-sizing: border-box;
+  background: rgba(76, 175, 80, 0.08);
+  cursor: move;
+}
+
+/* 8 个缩放手柄 */
+.handle {
+  position: absolute;
+  width: 14px; height: 14px;
+  background: #4caf50;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  z-index: 3;
+}
+.handle[data-h="nw"] { left: -7px;  top: -7px;   cursor: nwse-resize; }
+.handle[data-h="n"]  { left: 50%;   top: -7px;   margin-left: -7px;  cursor: ns-resize;   }
+.handle[data-h="ne"] { right: -7px; top: -7px;   cursor: nesw-resize; }
+.handle[data-h="e"]  { right: -7px; top: 50%;    margin-top: -7px;   cursor: ew-resize;   }
+.handle[data-h="se"] { right: -7px; bottom: -7px; cursor: nwse-resize; }
+.handle[data-h="s"]  { left: 50%;   bottom: -7px; margin-left: -7px; cursor: ns-resize;   }
+.handle[data-h="sw"] { left: -7px;  bottom: -7px; cursor: nesw-resize; }
+.handle[data-h="w"]  { left: -7px;  top: 50%;    margin-top: -7px;   cursor: ew-resize;   }
+
+#hint {
+  position: absolute;
+  top: 6px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  font-size: 12px;
+  font-family: "Microsoft YaHei", sans-serif;
+  padding: 4px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  z-index: 2;
+  pointer-events: none;
+}
+
+#save {
+  position: absolute;
+  top: 6px; right: 8px;
+  width: 30px; height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: #4caf50;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 2;
+}
+#save:hover { background: #388e3c; }
